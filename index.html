@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>BHT LIVE TV</title>
+  <title>BHT TEAM LIVE TV</title>
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -112,6 +112,36 @@
       transform: scale(1.1);
       box-shadow: 0 0 35px rgba(37, 211, 102, 0.8);
     }
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #22d3ee;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 20px auto;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      text-align: center;
+    }
+    .retry-btn {
+      background: #22d3ee;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -146,7 +176,25 @@
     <!-- Video Player -->
     <main class="flex flex-col items-center p-4 bg-black relative">
       <div class="w-full max-w-4xl aspect-video rounded-lg shadow-lg overflow-hidden relative tech-border">
-        <div id="player" class="w-full h-full"></div>
+        <div id="player" class="w-full h-full bg-gray-900 flex items-center justify-center">
+          <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="text-cyan-400 mt-2">Loading player...</p>
+          </div>
+        </div>
+        <div id="playerError" class="hidden error-message absolute inset-0 flex items-center justify-center">
+          <div class="text-center">
+            <i class="fas fa-exclamation-triangle text-red-400 text-4xl mb-2"></i>
+            <p class="text-red-400 font-semibold">Could not play video</p>
+            <p class="text-gray-300 text-sm mt-1">There was a problem loading the video stream</p>
+            <button onclick="retryCurrentChannel()" class="retry-btn mt-3">
+              <i class="fas fa-redo mr-2"></i>Retry Channel
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="nowPlaying" class="mt-4 text-center">
+        <p class="text-gray-400">Select a channel to start streaming</p>
       </div>
     </main>
 
@@ -163,7 +211,7 @@
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-center text-sm py-3 mt-auto tech-border">
-      <p class="footer-glow text-blue-400">© 2025 CYBERSKILLSS TEAM | Powered by <span class="text-pink-500 font-bold">CYBERSKILLSS TEAM</span></p>
+      <p class="footer-glow text-blue-400">© 2025 BHT TEAM | Powered by <span class="text-pink-500 font-bold">BLACK HACKERS TEAM</span></p>
     </footer>
   </div>
 
@@ -184,165 +232,66 @@
     function initializeApp() {
       const channels = [
         {
-          "name": "UTV",
+          "name": "UTV TANZANIA",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285337.m3u8",
+          "backupUrl": "https://live.utv.co.tz/live/stream.m3u8",
           "logo": "http://138.199.27.237:8080/AFRICA/GHANA/UTV-.png",
           "category": "TANZANIA"
         },
         {
-          "name": "KTN Burudani",
+          "name": "KTN BURUDANI",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285336.m3u8",
+          "backupUrl": "https://stream.ktnkenya.tv/live/ktnburudani/playlist.m3u8",
           "logo": "https://lo1.in/af/azams.png",
           "category": "TANZANIA"
         },
         {
           "name": "CROWN TV",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285335.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=CROWN+TV",
+          "backupUrl": "https://crown-tv.com/live/stream.m3u8",
+          "logo": "https://via.placeholder.com/150/1e293b/22d3ee?text=CROWN",
           "category": "TANZANIA"
         },
         {
-          "name": "Cheka Plus TV",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285334.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Cheka+Plus",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Azam Sport 4",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285333.m3u8",
+          "name": "AZAM SPORTS 1",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262957.m3u8",
+          "backupUrl": "https://azamsports.com/live/sport1/stream.m3u8",
           "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
-          "category": "TANZANIA"
+          "category": "SPORTS"
         },
         {
-          "name": "KeYona TV",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285332.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KeYona+TV",
-          "category": "TANZANIA"
+          "name": "AZAM SPORTS 2",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262955.m3u8",
+          "backupUrl": "https://azamsports.com/live/sport2/stream.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
+          "category": "SPORTS"
         },
         {
-          "name": "DW English",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285331.m3u8",
-          "logo": "http://103.161.34.238/dreamtv/tv/2Xh7jA1L_400x400.png",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Arise and Shine",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285330.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Arise+Shine",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Foodies",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285329.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Foodies",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "KIX Movies",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285328.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KIX+Movies",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "NTV Kenya",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285327.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=NTV+Kenya",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "NTV Uganda",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285326.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=NTV+Uganda",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "KTN Farmer",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285325.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KTN+Farm",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "KTN News",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285324.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KTN+News",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Salt TV",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285323.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Salt+TV",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Channel 44",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285322.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Channel+44",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Horizon TV",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285321.m3u8",
-          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Horizon+TV",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "ITV NETWORKS",
+          "name": "ITV TANZANIA",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1109671.m3u8",
+          "backupUrl": "https://itv.co.tz/live/stream.m3u8",
           "logo": "http://logodmtv.ddns.net/logo_plus/AFRICA/africa/ITV-SENEGAL.png",
           "category": "TANZANIA"
         },
         {
-          "name": "Azam Sports 1",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262957.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Azam Sports 2",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262955.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Azam Sports 3",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262953.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Sinema Zetu",
+          "name": "SINEMA ZETU",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262952.m3u8",
+          "backupUrl": "https://azam.tv/live/movies/stream.m3u8",
           "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Sinema Zetu.jpeg",
-          "category": "TANZANIA"
+          "category": "MOVIES"
         },
         {
-          "name": "CGTN Documentary",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262986.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/CGTN Documentary.png",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Azam One",
+          "name": "AZAM ONE",
           "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262954.m3u8",
+          "backupUrl": "https://azam.tv/live/one/stream.m3u8",
           "logo": "http://103.161.34.238/dreamtv/tv/maxresdefault.jpg",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "Azam TWO",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262956.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam%20TWO.jpeg",
-          "category": "TANZANIA"
-        },
-        {
-          "name": "ZBC 2",
-          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262964.m3u8",
-          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/ZBC 2.jpeg",
-          "category": "TANZANIA"
+          "category": "ENTERTAINMENT"
         }
       ];
 
       let player;
       let currentChannel = null;
+      let currentUrlIndex = 0;
 
       // Initialize channel list
       function initializeChannels() {
@@ -353,22 +302,45 @@
           const channelElement = document.createElement('div');
           channelElement.className = 'channel bg-gray-800 rounded-lg p-3 text-center cursor-pointer tech-border';
           channelElement.innerHTML = `
-            <img src="${channel.logo}" alt="${channel.name}" class="w-16 h-16 mx-auto mb-2 rounded-full object-cover">
+            <img src="${channel.logo}" alt="${channel.name}" 
+                 class="w-16 h-16 mx-auto mb-2 rounded-full object-cover"
+                 onerror="this.src='https://via.placeholder.com/150/1e293b/22d3ee?text=${channel.name.substring(0,2)}'">
             <p class="text-sm font-medium">${channel.name}</p>
           `;
           
           channelElement.addEventListener('click', () => playChannel(channel, index));
           channelList.appendChild(channelElement);
         });
+      }
 
-        // Auto-play first channel
-        if (channels.length > 0) {
-          playChannel(channels[0], 0);
+      // Show loading state
+      function showLoading() {
+        document.getElementById('playerError').classList.add('hidden');
+        document.getElementById('player').innerHTML = `
+          <div class="text-center">
+            <div class="loading-spinner"></div>
+            <p class="text-cyan-400 mt-2">Loading channel...</p>
+          </div>
+        `;
+      }
+
+      // Show error state
+      function showError() {
+        document.getElementById('player').innerHTML = '';
+        document.getElementById('playerError').classList.remove('hidden');
+      }
+
+      // Retry current channel
+      function retryCurrentChannel() {
+        if (currentChannel) {
+          playChannel(currentChannel, channels.indexOf(currentChannel));
         }
       }
 
       // Play channel function
       function playChannel(channel, index) {
+        showLoading();
+        
         // Remove active class from all channels
         document.querySelectorAll('.channel').forEach(el => {
           el.classList.remove('active');
@@ -377,14 +349,41 @@
         // Add active class to current channel
         document.querySelectorAll('.channel')[index].classList.add('active');
 
+        // Update now playing
+        document.getElementById('nowPlaying').innerHTML = `
+          <p class="text-cyan-400 font-semibold">Now Playing: ${channel.name}</p>
+          <p class="text-gray-400 text-sm">Category: ${channel.category}</p>
+        `;
+
         // Destroy existing player
         if (player) {
           player.destroy();
         }
 
+        currentChannel = channel;
+        currentUrlIndex = 0;
+
+        // Try to play the channel
+        tryPlayChannel(channel);
+      }
+
+      // Try to play channel with error handling
+      function tryPlayChannel(channel) {
+        const urls = [channel.url];
+        if (channel.backupUrl) {
+          urls.push(channel.backupUrl);
+        }
+
+        if (currentUrlIndex >= urls.length) {
+          showError();
+          return;
+        }
+
+        const currentUrl = urls[currentUrlIndex];
+
         // Create new player
         player = new Clappr.Player({
-          source: channel.url,
+          source: currentUrl,
           parentId: "#player",
           autoPlay: true,
           height: '100%',
@@ -392,16 +391,37 @@
           plugins: [],
           playback: {
             controls: true,
-            preload: 'auto'
+            preload: 'auto',
+            crossOrigin: 'anonymous'
+          },
+          events: {
+            onError: function(error) {
+              console.log('Player error:', error);
+              currentUrlIndex++;
+              setTimeout(() => tryPlayChannel(channel), 1000);
+            },
+            onReady: function() {
+              console.log('Player ready');
+              document.getElementById('playerError').classList.add('hidden');
+            },
+            onPlay: function() {
+              console.log('Video playing');
+              document.getElementById('playerError').classList.add('hidden');
+            }
           }
         });
-
-        currentChannel = channel;
       }
 
       // Initialize the app
       initializeChannels();
+
+      // Auto-play first channel after 3 seconds
+      setTimeout(() => {
+        if (channels.length > 0 && !currentChannel) {
+          playChannel(channels[0], 0);
+        }
+      }, 3000);
     }
   </script>
 </body>
-</html>
+  </html>
