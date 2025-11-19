@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BHT LIVE TV</title>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background-color: #0f172a;
+      color: white;
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      overflow-x: hidden;
+    }
+    .channel:hover {
+      transform: scale(1.05);
+      transition: transform 0.3s;
+    }
+    .channel.active {
+      border: 2px solid #22d3ee;
+      background-color: #1e293b;
+    }
+    .tech-title {
+      font-family: 'Orbitron', sans-serif;
+      background: linear-gradient(90deg, #3b82f6, #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(236, 72, 153, 0.5);
+      animation: glow 2s ease-in-out infinite alternate;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(236, 72, 153, 0.5);
+      }
+      to {
+        text-shadow: 0 0 15px rgba(59, 130, 246, 0.8), 0 0 25px rgba(236, 72, 153, 0.8), 0 0 30px rgba(236, 72, 153, 0.6);
+      }
+    }
+    .tech-border {
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+    }
+    .whatsapp-float {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background-color: #25D366;
+      color: #FFF;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 30px;
+      box-shadow: 0 0 15px rgba(37, 211, 102, 0.7);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulse 2s infinite;
+      cursor: pointer;
+    }
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(37, 211, 102, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(37, 211, 102, 0);
+      }
+    }
+    .footer-glow {
+      animation: footerGlow 3s ease-in-out infinite alternate;
+    }
+    @keyframes footerGlow {
+      from {
+        text-shadow: 0 0 5px rgba(59, 130, 246, 0.5);
+      }
+      to {
+        text-shadow: 0 0 10px rgba(59, 130, 246, 0.8), 0 0 15px rgba(236, 72, 153, 0.5);
+      }
+    }
+    .gateway-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, #3b82f6, #ec4899);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.7);
+      margin-bottom: 2rem;
+    }
+    .gateway-btn {
+      background: linear-gradient(135deg, #25D366, #128C7E);
+      padding: 20px 40px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 25px rgba(37, 211, 102, 0.5);
+    }
+    .gateway-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 35px rgba(37, 211, 102, 0.8);
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Gateway Page -->
+  <div id="gatewayPage" class="fixed inset-0 bg-gray-900 flex flex-col items-center justify-center z-50">
+    <div class="text-center max-w-4xl mx-auto px-4">
+      <h1 class="gateway-title mb-8">BHT TEAM LIVE TV</h1>
+      <p class="text-xl text-gray-300 mb-2">WELCOME TO OUR PREMIUM STREAMING SERVICE</p>
+      <p class="text-lg text-cyan-400 mb-8">FOLLOW OUR WHATSAPP CHANNEL FOR UPDATES & ACCESS</p>
+      
+      <button onclick="followWhatsApp()" class="gateway-btn text-white mb-4">
+        <i class="fab fa-whatsapp mr-3"></i>
+        FOLLOW OUR WHATSAPP CHANNEL
+      </button>
+      
+      <p class="text-sm text-gray-400 mt-8">After following, you will be redirected to the streaming platform</p>
+      <p class="text-xs text-gray-500 mt-2">Stay updated with latest channels and features</p>
+    </div>
+  </div>
+
+  <!-- Main App (Hidden Initially) -->
+  <div id="mainApp" class="hidden">
+    <!-- Header -->
+    <header class="py-4 px-6 bg-gray-900 tech-border">
+      <div class="container mx-auto flex justify-between items-center">
+        <h1 class="tech-title text-2xl md:text-4xl">BHT TEAM LIVE TV</h1>
+      </div>
+    </header>
+
+    <!-- Video Player -->
+    <main class="flex flex-col items-center p-4 bg-black relative">
+      <div class="w-full max-w-4xl aspect-video rounded-lg shadow-lg overflow-hidden relative tech-border">
+        <div id="player" class="w-full h-full"></div>
+      </div>
+    </main>
+
+    <!-- Channel List -->
+    <section class="p-4 flex-grow">
+      <h2 class="text-xl font-semibold mb-4 text-cyan-400">Available Channels - TANZANIA</h2>
+      <div id="channelList" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
+    </section>
+
+    <!-- WhatsApp Float Button -->
+    <div class="whatsapp-float" onclick="window.open('https://whatsapp.com/channel/0029VbAhAOJISTkRkIw3Sy1D', '_blank')">
+      <i class="fab fa-whatsapp"></i>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-center text-sm py-3 mt-auto tech-border">
+      <p class="footer-glow text-blue-400">© 2025 CYBERSKILLSS TEAM | Powered by <span class="text-pink-500 font-bold">CYBERSKILLSS TEAM</span></p>
+    </footer>
+  </div>
+
+  <script>
+    // Gateway Functionality
+    function followWhatsApp() {
+      window.open('https://whatsapp.com/channel/0029VbAhAOJISTkRkIw3Sy1D', '_blank');
+      
+      // Show main app after 2 seconds
+      setTimeout(() => {
+        document.getElementById('gatewayPage').style.display = 'none';
+        document.getElementById('mainApp').classList.remove('hidden');
+        initializeApp();
+      }, 2000);
+    }
+
+    // Main App Functionality
+    function initializeApp() {
+      const channels = [
+        {
+          "name": "UTV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285337.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/GHANA/UTV-.png",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "KTN Burudani",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285336.m3u8",
+          "logo": "https://lo1.in/af/azams.png",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "CROWN TV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285335.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=CROWN+TV",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Cheka Plus TV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285334.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Cheka+Plus",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam Sport 4",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285333.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "KeYona TV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285332.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KeYona+TV",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "DW English",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285331.m3u8",
+          "logo": "http://103.161.34.238/dreamtv/tv/2Xh7jA1L_400x400.png",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Arise and Shine",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285330.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Arise+Shine",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Foodies",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285329.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Foodies",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "KIX Movies",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285328.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KIX+Movies",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "NTV Kenya",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285327.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=NTV+Kenya",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "NTV Uganda",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285326.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=NTV+Uganda",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "KTN Farmer",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285325.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KTN+Farm",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "KTN News",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285324.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=KTN+News",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Salt TV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285323.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Salt+TV",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Channel 44",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285322.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Channel+44",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Horizon TV",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1285321.m3u8",
+          "logo": "https://via.placeholder.com/150/0f172a/ffffff?text=Horizon+TV",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "ITV NETWORKS",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/1109671.m3u8",
+          "logo": "http://logodmtv.ddns.net/logo_plus/AFRICA/africa/ITV-SENEGAL.png",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam Sports 1",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262957.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam Sports 2",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262955.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam Sports 3",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262953.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam Sports.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Sinema Zetu",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262952.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Sinema Zetu.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "CGTN Documentary",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262986.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/CGTN Documentary.png",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam One",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262954.m3u8",
+          "logo": "http://103.161.34.238/dreamtv/tv/maxresdefault.jpg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "Azam TWO",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262956.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/Azam%20TWO.jpeg",
+          "category": "TANZANIA"
+        },
+        {
+          "name": "ZBC 2",
+          "url": "http://front-main.eagle-4k.me:80/live/9fshhuw2z7/54hw7lwwb1/262964.m3u8",
+          "logo": "http://138.199.27.237:8080/AFRICA/TANZANIA/ZBC 2.jpeg",
+          "category": "TANZANIA"
+        }
+      ];
+
+      let player;
+      let currentChannel = null;
+
+      // Initialize channel list
+      function initializeChannels() {
+        const channelList = document.getElementById('channelList');
+        channelList.innerHTML = '';
+
+        channels.forEach((channel, index) => {
+          const channelElement = document.createElement('div');
+          channelElement.className = 'channel bg-gray-800 rounded-lg p-3 text-center cursor-pointer tech-border';
+          channelElement.innerHTML = `
+            <img src="${channel.logo}" alt="${channel.name}" class="w-16 h-16 mx-auto mb-2 rounded-full object-cover">
+            <p class="text-sm font-medium">${channel.name}</p>
+          `;
+          
+          channelElement.addEventListener('click', () => playChannel(channel, index));
+          channelList.appendChild(channelElement);
+        });
+
+        // Auto-play first channel
+        if (channels.length > 0) {
+          playChannel(channels[0], 0);
+        }
+      }
+
+      // Play channel function
+      function playChannel(channel, index) {
+        // Remove active class from all channels
+        document.querySelectorAll('.channel').forEach(el => {
+          el.classList.remove('active');
+        });
+
+        // Add active class to current channel
+        document.querySelectorAll('.channel')[index].classList.add('active');
+
+        // Destroy existing player
+        if (player) {
+          player.destroy();
+        }
+
+        // Create new player
+        player = new Clappr.Player({
+          source: channel.url,
+          parentId: "#player",
+          autoPlay: true,
+          height: '100%',
+          width: '100%',
+          plugins: [],
+          playback: {
+            controls: true,
+            preload: 'auto'
+          }
+        });
+
+        currentChannel = channel;
+      }
+
+      // Initialize the app
+      initializeChannels();
+    }
+  </script>
+</body>
+</html>
